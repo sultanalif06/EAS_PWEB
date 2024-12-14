@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                background: linear-gradient(45deg, #000000, #0a0a1a, #141430, #1e1e47);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: 'Arial', sans-serif;
+            }
+
+            .login-form {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+                padding: 40px;
+                width: 100%;
+                max-width: 400px;
+                transition: all 0.3s ease;
+            }
+
+            .login-form:hover {
+                transform: scale(1.02);
+                box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .login-form input {
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                transition: all 0.3s ease;
+            }
+
+            .login-form input:focus {
+                background: rgba(255, 255, 255, 0.3);
+                outline: 2px solid rgba(0, 193, 236, 0.7);
+            }
+
+            #login-button {
+                background: linear-gradient(to right, #401793, #44358a);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 25px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            #login-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 7px 14px rgba(0, 0, 0, 0.25);
+            }
+
+            #login-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: all 0.5s ease;
+            }
+
+            #login-button:hover::before {
+                left: 100%;
+            }
+
+            label {
+                color: rgba(255, 255, 255, 0.8);
+                font-weight: bold;
+            }
+
+            .register-link {
+                color: #00bfff;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .register-link:hover {
+                color: #00ffff;
+                text-decoration: underline;
+            }
+
+            #login-title {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+
+            .gold-gradient-text {
+                background: linear-gradient(to right, #FFD700, #B8860B);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+            }
+        </style>
+    </head>
+    <body>
+        <form enctype="multipart/form-data" id="loginForm" class="login-form" method="POST">
+            <div class="container">
+                <div class="text-center mb-4" id="login-title">
+                    <h2 class="gold-gradient-text">Welcome to <span class="gold-gradient-text">Ael</span>ma!</h2>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username or Email Address</label>
+                    <input type="text" class="form-control" placeholder="john@doe.com" name="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" type="password" class="form-control" placeholder="Enter your password" name="password" required>
+                </div>
+
+                <button id="login-button" type="submit" name="login" class="w-100">Login</button>
+
+                <div class="text-center mt-3">
+                    <span id="register-text" class="text-white">
+                        Don't have an account? 
+                        <a href="register.html" class="register-link">Register Here</a>
+                    </span>
+                </div>
+            </div>
+        </form>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            let userCookie = (document.cookie.match(/^(?:.*;)?\s*user\s*=\s*([^;]+)(?:.*)?$/)||[,null])[1];
+
+            if (userCookie != null) {
+                window.location.replace('homepage.html');
+            }
+
+            let input = document.getElementById('password');
+
+            input.addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    document.getElementById("login-button").click();
+                }
+            });
+
+            function login(e) {
+                let getData = new FormData(document.forms.loginForm);
+                let request = new XMLHttpRequest();
+                request.open("POST", "php/login.php", true);
+                request.send(getData);
+
+                request.onload = function() {
+                    switch (request.response.substr(-3)) {
+                        case '200':
+                            window.location.replace('homepage.html');
+                            break;
+                        case '201':
+                            alert('Login failed');
+                            break;
+                        case '301':
+                            alert('Wrong password');
+                            break;
+                        case '302':
+                            alert('Username/email is not registered');
+                            break;
+                        case '401':
+                            alert('Username/email is empty');
+                            break;
+                        case '402':
+                            alert('Password is empty');
+                            break;
+                    }
+                }
+
+                e.preventDefault();
+            }
+
+            document.getElementById('loginForm').addEventListener('submit', login);
+        </script>
+    </body>
+</html>
